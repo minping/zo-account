@@ -1,0 +1,18 @@
+
+添加一笔记账 : 输入[描述+金额]
+例如: [吃黄焖鸡花了25] 或 [30用在京东购物] 或 [买了20快水果] (只要带有数字金额即可)
+查看今日记账     : 输入[1]
+查看今日记账明细  : 输入[2]
+查看本周记账     : 输入[3]
+查看本周记账明细  : 输入[4]
+查看本月记账     : 输入[5]
+查看本月记账明细  : 输入[6]
+输入[帮助]即可查看所有指令
+如果对我有一些想法或建议,欢迎输入内容
+
+
+
+2023-05-28 23:16:56.217  INFO 501626 --- [-nio-812-exec-1] c.e.z.w.controller.WechatController      : 获取的数据信息>>>>>   取消关注
+2023-05-28 23:16:56.218  INFO 501626 --- [-nio-812-exec-1] c.e.z.w.service.impl.IWechatServiceImpl  : 接收到的消息：ReceiveMsgBody(ToUserName=gh_9d0cc05e130c, FromUserName=oDXuK6OAwosLrAqW4gMQu926T4Ww, CreateTime=1685287015, MsgType=event, MsgId=0, Content=null)
+2023-05-28 23:17:16.805  INFO 501626 --- [-nio-812-exec-2] c.e.z.w.controller.WechatController      : 获取的数据信息>>>>>    关注
+2023-05-28 23:17:16.805  INFO 501626 --- [-nio-812-exec-2] c.e.z.w.service.impl.IWechatServiceImpl  : 接收到的消息：ReceiveMsgBody(ToUserName=gh_9d0cc05e130c, FromUserName=oDXuK6OAwosLrAqW4gMQu926T4Ww, CreateTime=1685287036, MsgType=event, MsgId=0, Content=null)

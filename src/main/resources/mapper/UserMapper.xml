@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.zodeaccount.common.mapper.UserMapper">
+
+    <select id="selectUserByOpenId" resultType="java.util.Map">
+        SELECT
+        sys_user_id
+        FROM `sys_user`
+        WHERE del_flag = 0
+        AND open_id = #{openId}
+    </select>
+
+    <select id="selectUserByMiniAppOpenId" resultMap="UserDetail">
+        SELECT
+        *
+        FROM `sys_user`
+        WHERE del_flag = 0
+        AND miniapp_open_id = #{openId}
+    </select>
+
+    <resultMap id="UserDetail" type="com.example.zodeaccount.common.pojo.UserDetail">
+        <id column="sys_user_id" property="sys_user_id"></id>
+    </resultMap>
+
+
+    <!--
+    两个子标签，哪个不一样就写哪个
+    id:完成主键字段的映射
+        column:表的列名
+        property:实体类的属性名
+    result:完成一般字段的映射
+        column:表的列名
+        property:实体类的属性名
+    -->
+</mapper>
