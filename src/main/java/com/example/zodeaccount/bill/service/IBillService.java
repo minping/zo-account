@@ -55,4 +55,31 @@ public interface IBillService {
      * @return
      */
     Result getStaticsEachDay(String yearMonth);
+
+    /**
+     * 获取当前日期
+     * @return
+     */
+    Result getCurrentDate();
+
+    /**
+     * 查出前十个金额最大账单
+     * @return
+     */
+    Result getBillByRank(String yearMonth);
+
+    /**
+     * 按月统计
+     * @param yearMonth
+     * @return
+     */
+    Result getStaticsEachMonth(String yearMonth);
+
+    /**
+     * 获取一个分类下的账单数据
+     * @param yearMonth
+     * @param typeId
+     * @return
+     */
+    Result getBillByType(String yearMonth,String typeId);
 }

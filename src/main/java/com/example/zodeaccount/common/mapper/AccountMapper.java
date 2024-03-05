@@ -25,11 +25,17 @@ public interface AccountMapper extends BaseMapper<Account> {
 
     List<Map<String, Object>> selectMyBillByUserId(Map<String,Object> para);
 
+    List<Map<String, Object>> selectBillByRank(Map<String,Object> para);
+
+    List<Map<String, Object>> getBillByType(Map<String,Object> para);
+
     Map<String, Object> selectSumMoneyOneMonth(Map<String,Object> para);
 
     List<Map<String, Object>> selectStaticsProportion(Map<String,Object> para);
 
     List<Map<String, Object>> selectStaticsEachDay(Map<String,Object> para);
+
+    List<Map<String, Object>> selectStaticsEachMonth(Map<String,Object> para);
 
 
 }

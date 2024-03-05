@@ -16,7 +16,15 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Period;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjuster;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Service
@@ -172,6 +180,13 @@ public class IBillServiceImpl implements IBillService {
         para.put("linkUserId", (StringUtils.isNotBlank(linkUserId)?linkUserId:""));
         para.put("yearMonth", yearMonth);
         List<Map<String, Object>> list = accountMapper.selectStaticsProportion(para);
+        BigDecimal totalMoney = list.stream().map(m -> new BigDecimal(m.get("money").toString()))
+                .reduce(new BigDecimal(0), (x, y) -> x.add(y));
+        list.stream().forEach( item ->{
+            BigDecimal money = new BigDecimal(item.get("money").toString());
+            String por = money.multiply(new BigDecimal(100)).divide(totalMoney, 1, BigDecimal.ROUND_HALF_UP).toString();
+            item.put("por",por);
+        });
         List<Map<String, Object>> result = list.stream().map(map -> {
             map.put("value", map.get("money").toString());
             map.put("name", map.get("categories").toString() + " " + map.get("money").toString());
@@ -193,6 +208,21 @@ public class IBillServiceImpl implements IBillService {
      */
     @Override
     public Result getStaticsEachDay(String yearMonth) {
+        LocalDate now = LocalDate.now();
+        int nowDayOfMonth = now.getDayOfMonth();
+        int nowYear = now.getYear();
+        int nowMonthValue = now.getMonthValue();
+
+        Calendar instance = Calendar.getInstance();
+        int year = Integer.parseInt(yearMonth.substring(0,4));
+        int month = Integer.parseInt(yearMonth.substring(4).split("-")[1]);
+        instance.set(Calendar.YEAR,year);
+        instance.set(Calendar.MONTH,month-1);
+        instance.set(Calendar.DAY_OF_MONTH,1);
+        // 算出这个月多少天
+        int monthDays = instance.getActualMaximum(Calendar.DAY_OF_MONTH);
+//        int monthDays =  instance.get(Calendar.DAY_OF_MONTH);
+
         UserDetail userDetail = UserTheadLocal.get();
         String userId = userDetail.getSys_user_id();
         String linkUserId = userDetail.getLinkUserId();
@@ -203,17 +233,140 @@ public class IBillServiceImpl implements IBillService {
         List<Map<String, Object>> list = accountMapper.selectStaticsEachDay(para);
         List<String> days = new LinkedList<>();
         List<Double> money = new LinkedList<>();
-        list.stream().sorted( (x,y) ->{
-            Integer xDay = Integer.parseInt(x.get("day").toString());
-            Integer yDay = Integer.parseInt(y.get("day").toString());
-            return xDay.compareTo(yDay);
-        }).forEach( i -> {
-            days.add(i.get("day").toString());
-            money.add(Double.parseDouble(i.get("money").toString()));
-        });
+        Map<String, String> dayToMoney = list.stream().collect(Collectors.toMap(m -> m.get("day").toString(), m -> m.get("money").toString(), (x, y) -> x));
+
+        if(year == nowYear && nowMonthValue == month){
+            // 当前月时 有数据补数据 没数据时要判断 未来的日子不补数据
+            for (int i = 1; i <= monthDays; i++) {
+                String day = String.valueOf(i);
+                days.add(day);
+                if (dayToMoney.containsKey(day)){
+                    money.add(Double.parseDouble(dayToMoney.get(day)));
+                }else{
+                    if(i <= nowDayOfMonth){
+                        money.add(0.0);
+                    }
+                }
+            }
+        }else{
+            // 非当前月 没有数据都补0
+            for (int i = 1; i <= monthDays; i++) {
+                String day = String.valueOf(i);
+                days.add(day);
+                if (dayToMoney.containsKey(day)){
+                    money.add(Double.parseDouble(dayToMoney.get(day)));
+                }else{
+                    money.add(0.0);
+                }
+            }
+        }
+
         Map<String,Object> result = new HashMap<>();
         result.put("days",days);
         result.put("money",money);
         return Result.me().success().setData(result);
+    }
+
+    public static int getDaysInMonth(int year, int month) {
+        YearMonth yearMonthObject = YearMonth.of(year, month);
+        return yearMonthObject.lengthOfMonth();
+    }
+
+    /**
+     * 获取当前日期
+     *
+     * @return
+     */
+    @Override
+    public Result getCurrentDate() {
+        LocalDateTime now = LocalDateTime.now();
+        Map<String,Object> kv = new HashMap<>();
+        kv.put("year",now.getYear());
+        kv.put("month",now.getMonthValue());
+        kv.put("day",now.getDayOfMonth());
+        return Result.me().success().setData(kv);
+    }
+
+    /**
+     * 查出前十个金额最大账单
+     *
+     * @return
+     */
+    @Override
+    public Result getBillByRank(String yearMonth) {
+        UserDetail userDetail = UserTheadLocal.get();
+        String userId = userDetail.getSys_user_id();
+        String linkUserId = userDetail.getLinkUserId();
+        Map<String,Object> para = new HashMap<>();
+        para.put("userId",userId);
+        para.put("linkUserId", (StringUtils.isNotBlank(linkUserId)?linkUserId:""));
+        para.put("yearMonth", (StringUtils.isNotBlank(yearMonth)?yearMonth:""));
+        List<Map<String, Object>> maps = accountMapper.selectBillByRank(para);
+        return Result.me().success(maps);
+    }
+
+    /**
+     * 按月统计
+     *
+     * @param yearMonth
+     * @return
+     */
+    @Override
+    public Result getStaticsEachMonth(String yearMonth) {
+        UserDetail userDetail = UserTheadLocal.get();
+        String userId = userDetail.getSys_user_id();
+        String linkUserId = userDetail.getLinkUserId();
+        Map<String,Object> para = new HashMap<>();
+        para.put("userId",userId);
+        para.put("linkUserId", (StringUtils.isNotBlank(linkUserId)?linkUserId:""));
+        para.put("yearMonth", (StringUtils.isNotBlank(yearMonth)?yearMonth:""));
+        List<Map<String, Object>> maps = accountMapper.selectStaticsEachMonth(para);
+        Map<String, Map<String, Object>> listMap = maps.stream().collect(
+                Collectors.toMap(
+                        m -> m.get("month").toString(),
+                        Function.identity(),
+                        (x, y) -> x
+                )
+        );
+        LocalDate now = LocalDate.now();
+        List<String> months = new LinkedList<>();
+        for (int i = 0; i < 6; i++) {
+            LocalDate before = now.minus(Period.ofMonths(i));
+            months.add(before.getYear() +"年"+before.getMonthValue()+"月");
+        }
+        Map<String,Object> result = new HashMap<>();
+        result.put("months",months);
+        List<String> money = months.stream()
+                .map(e -> {
+                    if (listMap.containsKey(e)){
+                        return String.valueOf(listMap.get(e).get("money"));
+                    }else{
+                        return "0";
+                    }
+                })
+                .collect(Collectors.toList());
+        result.put("money",money);
+        return Result.me().success().setData(result);
+    }
+
+    /**
+     * 获取一个分类下的账单数据
+     *
+     * @param yearMonth
+     * @param typeId
+     * @return
+     */
+    @Override
+    public Result getBillByType(String yearMonth, String typeId) {
+        UserDetail userDetail = UserTheadLocal.get();
+        String userId = userDetail.getSys_user_id();
+        String linkUserId = userDetail.getLinkUserId();
+        Map<String,Object> para = new HashMap<>();
+        para.put("userId",userId);
+        para.put("typeId",typeId);
+        para.put("linkUserId", (StringUtils.isNotBlank(linkUserId)?linkUserId:""));
+        para.put("yearMonth", (StringUtils.isNotBlank(yearMonth)?yearMonth:""));
+        List<Map<String, Object>> maps = accountMapper.getBillByType(para);
+        return Result.me().success(maps);
     }
 }
