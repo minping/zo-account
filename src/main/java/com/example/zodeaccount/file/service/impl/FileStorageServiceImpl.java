@@ -22,6 +22,7 @@ import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Date;
 
 /**
  * @author zhoump
@@ -62,20 +63,20 @@ public class FileStorageServiceImpl implements FileStorageService {
             // 存储文件
             file.transferTo(filePath.toFile());
 
-            // 保存元数据
-            ZoFile zoFile = new ZoFile();
-            zoFile.setZoFileId(StrKit.uuid());
-            zoFile.setOriginalName(originalFilename);
-            zoFile.setStorageName(storageName);
-            zoFile.setFilePath(filePath.toString());
-            zoFile.setFileSize(file.getSize());
-            zoFile.setFileType(file.getContentType());
-            zoFile.setFileExtension(fileExtension);
-            zoFile.setMd5Hash(md5Hash);
-            zoFile.setUploaderId("");
-            zoFile.setDescription("");
-            zoFile.save();
-            return Result.me().success().setData("file");
+            Record zoFile = new Record();
+            zoFile.set("zo_file_id",StrKit.uuid());
+            zoFile.set("created_time",new Date());
+            zoFile.set("updated_time",new Date());
+            zoFile.set("upload_time",new Date());
+            zoFile.set("original_name",originalFilename);
+            zoFile.set("storage_name",storageName);
+            zoFile.set("file_path",filePath.toString());
+            zoFile.set("file_size",file.getSize());
+            zoFile.set("file_type",file.getContentType());
+            zoFile.set("file_extension",fileExtension);
+            zoFile.set("md5_hash",md5Hash);
+            Db.save("zo_file",zoFile);
+            return Result.me().success().setData(file);
         }catch (Exception e){
             return Result.me().error().setMessage("上传文件失败");
         }
