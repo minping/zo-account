@@ -1,28 +1,35 @@
 package com.example.zodeaccount.plugin.controller;
 
-import com.example.zodeaccount.common.util.StrKit;
-import com.example.zodeaccount.handler.AuthIgnore;
-import com.example.zodeaccount.plugin.util.MarkdownToHtmlConverter;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.example.zodeaccount.handler.PlugInAuth;
+import com.example.zodeaccount.plugin.service.PlugInService;
+import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
+import java.util.Map;
 
 @RestController
-@RequestMapping
+@RequestMapping("/plugin/")
 public class PlugInController {
 
-    @AuthIgnore
+    @Resource
+    PlugInService plugInService;
+
+    @PlugInAuth
     @PostMapping("parseMarkdown")
-    public String parseMarkdown(String content,String key) {
-        if(StrKit.isBlank(content) || StrKit.isBlank(key)){
-            return "";
-        }
-        if(!"DreamSoft!@#@123".equals(key)){
-            return "";
-        }
-        content = StrKit.base64Decoder(content);
-        String html = MarkdownToHtmlConverter.parseMarkdown(content);
-        return html;
+    public String parseMarkdown(@RequestBody Map<String,Object> param) {
+        return plugInService.parseMarkdown(param);
+    }
+
+    @PlugInAuth
+    @GetMapping("fetchWeChatArticleCoverImage")
+    public String fetchWeChatArticleCoverImage(String width,String  height){
+        return plugInService.fetchWeChatArticleCoverImage(width, height);
+    }
+
+    @PlugInAuth
+    @GetMapping("bliVideoParser")
+    public String bliVideoParser(String bid){
+        return plugInService.bliVideoParser(bid);
     }
 
 }
