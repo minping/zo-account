@@ -7,6 +7,8 @@ import com.vladsch.flexmark.util.data.MutableDataSet;
 
 import java.util.Arrays;
 import java.util.StringTokenizer;
+import java.util.regex.Pattern;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -102,7 +104,7 @@ public class MarkdownToHtmlConverter {
                 "body {width: 375px;padding: 20px;position: relative;font-family: Optima-Regular, Optima, PingFangSC-light, PingFangTC-light, 'PingFang SC', Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;font-size: 14px;line-height: 1.75;text-align: left;pointer-events: initial !important;}\n" +
                 "h1{font-family: Optima-Regular, Optima, PingFangSC-light, PingFangTC-light, 'PingFang SC', Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;padding: 0.5em 1em;border-bottom: 2px solid #FA5151;font-size: 19.6px;text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);margin: 0.67em auto;font-weight: bold;text-align: center;color: hsl(0 0% 6% / 1);}\n" +
                 "h2{font-family: Optima-Regular, Optima, PingFangSC-light, PingFangTC-light, 'PingFang SC', Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;padding: 0.3em 1em;border-radius: 8px;font-size: 18.2px;box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);margin: 2.5em auto 2em;color: #fff;background: #FA5151;font-weight: bold;text-align: center;}\n" +
-                "h3{font-family: Optima-Regular, Optima, PingFangSC-light, PingFangTC-light, 'PingFang SC', Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;padding-left: 12px;font-size: 16.8px;border-left: 4px solid #FA5151;border-bottom: 1px dashed #FA5151;color: hsl(0 0% 6% / 1);font-weight: bold;line-height: 1.2;}\n" +
+                "h3{font-family: Optima-Regular, Optima, PingFangSC-light, PingFangTC-light, 'PingFang SC', Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;margin: 2em 8px 0.75em 0;color: #3f3f3f;font-weight: bold;line-height: 1.2;padding-left: 12px;font-size: 16.8px;border-left: 4px solid #FA5151;border-bottom: 1px dashed #FA5151;}\n" +
                 "h4{font-family: Optima-Regular, Optima, PingFangSC-light, PingFangTC-light, 'PingFang SC', Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;margin: 2em 8px 0.5em;color: #FA5151;font-size: 15.4px;font-weight: bold;}\n" +
                 "h5{font-family: Optima-Regular, Optima, PingFangSC-light, PingFangTC-light, 'PingFang SC', Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;margin: 1.5em 8px 0.5em;color: #FA5151;font-size: 14px;font-weight: bold;}\n" +
                 "h6{font-family: Optima-Regular, Optima, PingFangSC-light, PingFangTC-light, 'PingFang SC', Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;margin: 1.5em 8px 0.5em;font-size: 14px;color: #FA5151;}\n" +
@@ -113,9 +115,10 @@ public class MarkdownToHtmlConverter {
                 "pre code {padding: 0;}\n" +
                 "strong {color: #FA5151;font-weight: bold;font-size: inherit;}\n" +
                 "blockquote {font-size: 14px;line-height: 1.75;text-align: left;background: #f7f7f7;border-color: hsl(0 0% 89.8%);font-style: italic;padding: 1em 1em 1em 2em;border-left: 4px solid #FA5151;border-radius: 6px;color: rgba(0, 0, 0, 0.6);box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);margin:  0 0 1em 0;}\n" +
-                "table {border-collapse: collapse; width: 100%;}\n" +
-                "th, td {border: 1px solid #dfe2e5; padding: 0.5em 1em;}\n" +
-                "th {background-color: #f6f8fa; font-weight: 600;}\n" +
+                "table {font-family: Optima-Regular, Optima, PingFangSC-light, PingFangTC-light, 'PingFang SC', Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;font-size: 14px;line-height: 1.75;text-align: left;margin-top: 0 !important;border-collapse: separate;border-radius: 8px;border-spacing: 0;margin: 1em 0;color: hsl(var(0 0% 3.9%));box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);}\n" +
+                "thead {font-weight: bold;}\n" +
+                "th {border: 1px solid #dfdfdf;color: hsl(0 0% 3.9%);word-break: keep-all;background: rgba(0, 0, 0, 0.05);padding: 0.25em 0.5em;}\n" +
+                "td {padding: 0.5em 1em;border: 1px solid #dfdfdf;padding: 0.25em 0.5em;color: hsl(0 0% 3.9%);word-break: normal;}\n" +
                 "hr {height: 1px;border: none;margin: 2em 0;background: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0));}\n" +
                 "ul, ol {list-style-type: disc;padding-left: 1.5em;margin: 10px 0;}\n" +
                 "li {font-family: Optima-Regular, Optima, PingFangSC-light, PingFangTC-light, 'PingFang SC', Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;font-size: 14px;line-height: 1.75;text-align: left;margin: 0.5em 8px;color: hsl(0 0% 6% / 1);}\n" +
@@ -143,7 +146,9 @@ public class MarkdownToHtmlConverter {
         // 更佳实践：在将最终生成的 HTML 输出到前端页面时，由模板引擎（如 Thymeleaf, FreeMarker）自动转义，或使用 HtmlUtils.htmlEscape() 处理其中嵌入的不信任变量。
 
         System.out.println(content);
-        content = content.replace("\\n", "\n");
+        content = content.replaceAll("\\n", "\n");
+        content = content.replaceAll("\\\\n", "\n");
+        content = content.replaceAll(Pattern.quote("****"), "**");
         // 2. 转换 Markdown 到 HTML
         String styledHtml = MarkdownToHtmlConverter.convertMarkdownToHtml(content);
         String inlinedHtml = inlineCss(styledHtml);

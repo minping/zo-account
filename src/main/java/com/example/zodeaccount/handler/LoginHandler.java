@@ -36,6 +36,15 @@ public class LoginHandler implements HandlerInterceptor {
         if (handlerMethod.hasMethodAnnotation(AuthIgnore.class)){
             return true;
         }
+        if (handlerMethod.hasMethodAnnotation(PlugInAuth.class)){
+            String code = request.getHeader("code");
+            if ("DreamSoft!@#@123".equals(code)){
+                return true;
+            }else{
+                WebUtils.renderString(response,JSON.toJSONString(Result.me().error().setMessage("code失效或过期")));
+                return false;
+            }
+        }
         String token = request.getHeader("Authorization");
         if (StringUtils.isBlank(token)){
             WebUtils.renderString(response,JSON.toJSONString(Result.me().error().setMessage("登录信息失效或过期")));
