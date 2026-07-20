@@ -59,24 +59,27 @@ public class IWechatServiceImpl implements IWechatService {
     public Object replyFollow(ReceiveMsgBody receiveMsgBody) {
         logger.info("发送关注自动回复");
         // 响应的消息
-        String content = "欢迎您的关注\n" +
-                "本号提供以下功能以及指令\n" +
-                "zo记账,快速记下每一笔支出~\n" +
-                "添加一笔记账:输入[描述+金额]\n" +
-                "例如: [吃黄焖鸡花了25] \n" +
-                "  或 [30.8用在京东购物]\n" +
-                "  或 [买了20.55元水果]\n" +
-                "  (只要带有数字的金额即可)\n" +
-                "输入[1]:查看今日记账\n" +
-                "输入[2]:查看今日记账明细\n" +
-                "输入[3]:查看本周记账\n" +
-                "输入[4]:查看本周记账明细\n" +
-                "输入[5]:查看本月记账\n" +
-                "输入[6]:查看本月记账明细\n"+
-                "输入[帮助]即可查看所有指令\n" +
-                "  \n" +
+        String content = "欢迎您的关注\n"+
                 "如果对我有一些想法或建议\n" +
                 "欢迎输入内容(●'◡'●)";
+        //String content = "欢迎您的关注\n" +
+        //        "本号提供以下功能以及指令\n" +
+        //        "zo记账,快速记下每一笔支出~\n" +
+        //        "添加一笔记账:输入[描述+金额]\n" +
+        //        "例如: [吃黄焖鸡花了25] \n" +
+        //        "  或 [30.8用在京东购物]\n" +
+        //        "  或 [买了20.55元水果]\n" +
+        //        "  (只要带有数字的金额即可)\n" +
+        //        "输入[1]:查看今日记账\n" +
+        //        "输入[2]:查看今日记账明细\n" +
+        //        "输入[3]:查看本周记账\n" +
+        //        "输入[4]:查看本周记账明细\n" +
+        //        "输入[5]:查看本月记账\n" +
+        //        "输入[6]:查看本月记账明细\n"+
+        //        "输入[帮助]即可查看所有指令\n" +
+        //        "  \n" +
+        //        "如果对我有一些想法或建议\n" +
+        //        "欢迎输入内容(●'◡'●)";
         ResponseMsgBody textMsg = new ResponseMsgBody();
         textMsg.setToUserName(receiveMsgBody.getFromUserName());
         textMsg.setFromUserName(receiveMsgBody.getToUserName());

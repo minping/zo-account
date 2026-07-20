@@ -78,10 +78,6 @@ public class HttpClientUtil {
         catch (IOException e) {
             e.printStackTrace();
         }
-        finally {
-//            addDataCenterLogs(url, params, response.getStatusLine().getStatusCode(), strResult);
-        }
-
         return null;
     }
 
@@ -116,8 +112,6 @@ public class HttpClientUtil {
             }
         }
         finally {
-//            addDataCenterLogs(url, params, state, jsonString);
-
             if (response != null) {
                 try {
                     response.close();
@@ -169,8 +163,6 @@ public class HttpClientUtil {
             }
         }
         finally {
-//            addDataCenterLogs(url, params, state, jsonString);
-
             if (response != null) {
                 try {
                     response.close();
