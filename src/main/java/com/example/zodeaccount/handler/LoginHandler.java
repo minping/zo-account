@@ -71,4 +71,10 @@ public class LoginHandler implements HandlerInterceptor {
         }
         return headerMap;
     }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        UserTheadLocal.remove();
+        HandlerInterceptor.super.afterCompletion(request, response, handler, ex);
+    }
 }
